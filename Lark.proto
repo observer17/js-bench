@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package lark;
+
+message LarkMessage {
+  enum Type {
+    UNKNOWN = 0;
+    TEXT = 1;
+    POST = 2;
+    IMAGE = 3;
+    FILE = 4;
+  }
+  required int32 id = 1;
+  required Type type = 2;
+}

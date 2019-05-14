@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>ProtoBuff Test</title>
+  </head>
+  <body>
+    <script src="https://cdn.rawgit.com/dcodeIO/protobuf.js/6.8.8/dist/protobuf.min.js"></script>
+    <script>
+      const pbJson = {
+        nested: {
+          LarkMessage: {
+            fields: {
+              id: {
+                type: "int32",
+                id: 1
+              }
+            }
+          }
+        }
+      };
+      const pbRoot = protobuf.Root.fromJSON(pbJson);
+
+      /*
+      let pbRoot = null;
+
+      protobuf.load("./Lark.proto", function (err, root) {
+        if (err) throw err;
+        pbRoot = root;
+      });
+      */
+
+      function decode(buf) {
+        const LarkMessage = pbRoot.lookupType("LarkMessage");
+        return LarkMessage.decode(buf);
+      }
+
+      function encode(message) {
+        const LarkMessage = pbRoot.lookupType("LarkMessage");
+        var errMsg = LarkMessage.verify(message);
+        if (errMsg) throw Error(errMsg);
+
+        var m = LarkMessage.create(message);
+        return LarkMessage.encode(message).finish();
+      }
+
+      const start = Date.now();
+      for (let i = 0; i < 10000; i++) {
+        const message = {
+          id: i,
+          type: i % 5
+        }
+        const buf = encode(message);
+        decode(buf);
+      }
+      console.error('run time', Date.now() - start);
+    </script>
+  </body>
+</html>
